@@ -1,4 +1,4 @@
-source("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift/generate_data.R", echo = FALSE)
+library(GET)
 test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r, 
                                      n_perm = 199, bw = "silverman", type = "inhom") {
   
