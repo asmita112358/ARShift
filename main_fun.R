@@ -30,17 +30,12 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r,
   
   
   
-  #obs_K$Kcross_stat
-  #obs_Kstar <- obs_K$Kstar
-  #obs_Pcross <- obs_K$Pcross
-  
   
   # Initialize storage for permutation results
   Kcross_toroidal <- matrix(NA, nrow = n_perm, ncol = n_dist)
   Kcross_uncorr <- matrix(NA, nrow = n_perm, ncol = n_dist)
   Kcross_areacorr <- matrix(NA, nrow = n_perm, ncol = n_dist)
-  #Kcross_og <- matrix(NA, nrow = n_perm, ncol = n_dist)
-  #Pcross_toroidal <- matrix(NA, nrow = n_perm, ncol = n_dist)
+  
   
   
   shift_vectors <- matrix(nrow = 2, ncol = n_perm)
@@ -95,13 +90,11 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r,
     if(type == "inhom"){
       Kcross_uncorr[perm_idx,] <- Kcross.inhom(pp_reduced, i = as.character(base_taxa), j = as.character(shift_taxa), 
                                                r = r, correction = "isotropic")[[3]]
-      # Kcross_og[perm_idx, ] <- Kcross.inhom(pp_og, i = as.character(base_taxa), j = as.character(shift_taxa), 
-      #                                r = r, correction = "isotropic")[[3]]
+    
     }else{
       Kcross_uncorr[perm_idx,] <- Kcross(pp_reduced, i = as.character(base_taxa), j = as.character(shift_taxa), 
                                          r = r, correction = "isotropic")[[3]]
-      #  Kcross_og[perm_idx, ] <- Kcross(pp_og, i = as.character(base_taxa), j = as.character(shift_taxa), 
-      #                                 r = r, correction = "isotropic")[[3]]
+   
     }
     
     area_shift[perm_idx] <- area.owin(window_reduced)
@@ -120,7 +113,7 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r,
     
     perm_idx <- perm_idx + 1
   }
-  #CS <- curve_set(r = r[-1], obs = obs_Kcross[-1], sim = t(Kcross_uncorr[,-1]))
+ 
   #variance correction by area of window
   meanK <- colMeans(Kcross_uncorr, na.rm = TRUE)
   T_0 <- sqrt(win_area)*(obs_Kcross - meanK)
@@ -136,7 +129,7 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r,
   shift_vectors_full <- cbind(shift_vectors, c(0, 0))
   bw_shift <- select_bandwidth(shift_vectors_full, method = bw)
   
-  # Variance-corrected tests (shift-based only)
+  # Variance-corrected tests 
   vc_results <- compute_variance_corrected_tests(
     Kcross_uncorr, obs_Kcross, shift_vectors_full, 
     bw_shift, r, n_perm
@@ -147,42 +140,17 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r,
   
   pval_Kcross_area <- compute_envelope_pval(r, T_0, t(T_scaled))
   
-  #compare mean of Kcross_og vs Kcross_uncorr
-  # pval_Kcross_og <- compute_envelope_pval(r, colMeans(Kcross_og), Kcross_uncorr)
   
   return(list(
     pval_Kcross_tor = pval_Kcross_tor,
     pval_Kcross_vc = vc_results$pval_vc_shift,
     pval_Kcross_uncorr = pval_Kcross_uncorr, 
     pval_Kcross_area = pval_Kcross_area
-    # pval_Kcross_og = pval_Kcross_og
   ))
 }
 
 
 ## Helper functions
-process_matrix <- function(Kcross_uncorr, r) {
-  
-  # Step 1: Identify columns that are ALL NA or NaN
-  all_na_cols <- apply(Kcross_uncorr, 2, function(col) all(is.na(col)))
-  
-  # Keep only columns that are NOT all NA/NaN
-  Kcross_uncorr_filtered <- Kcross_uncorr[, !all_na_cols, drop = FALSE]
-  r_filtered <- r[!all_na_cols]
-  
-  # Step 2: Identify rows that are ALL NA or NaN
-  all_na_rows <- apply(Kcross_uncorr_filtered, 1, function(row) all(is.na(row)))
-  
-  # Keep only rows that are NOT all NA/NaN
-  Kcross_uncorr_filtered <- Kcross_uncorr_filtered[!all_na_rows, , drop = FALSE]
-  
-  return(list(
-    Kcross_uncorr = Kcross_uncorr_filtered,
-    r = r_filtered,
-    n_cols_removed = sum(all_na_cols),
-    n_rows_removed = sum(all_na_rows)
-  ))
-}
 
 
 compute_variance_corrected_tests <- function(K_vc_matrix, obs_K, shift_vectors, 
