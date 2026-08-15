@@ -1,7 +1,9 @@
 library(GET)
-test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r, 
-                                     n_perm = 199, bw = "silverman", type = "inhom") {
+test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NULL, 
+                                     n_perm = 199, bw = "silverman", type = "inhom", lite = FALSE, thin_prob = 0.2) {
   
+  if(lite) data <- rthin(data, thin_prob)
+  if(is.null(r)){rmax <- 0.3 * incircle(data$window)$r; r <- seq(0, rmax, length.out = 50)}
   n_dist <- length(r)
   freq_marks <- table(data$marks)
   original_window <- data$window
@@ -11,7 +13,12 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r,
   n_shift <- as.numeric(freq_marks[as.character(shift_taxa)])
   
   if (is.na(n_base) || is.na(n_shift) || n_base == 0 || n_shift == 0) {
-    stop("Base or shift taxa not found or has zero count")
+    return(list(
+      pval_Kcross_tor = NA,
+      pval_Kcross_vc = NA,
+      pval_Kcross_uncorr = NA, 
+      pval_Kcross_area = NA
+    ))
   }
   
   # Compute observed statistics
