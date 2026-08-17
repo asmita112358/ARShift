@@ -424,3 +424,19 @@ for (pair in taxa_pairs) {
     height = 4
   )
 }
+
+##
+
+results_healthy_qvalue <- readRDS("real_data_results/Qresultshealthy.rds")
+results_muco_qvalue <- readRDS("real_data_results/Qresultsmuco.rds")
+
+sapply(results_healthy_qvalue, function(x)x$ARshift[1,2])
+sapply(results_healthy_qvalue, function(x)x$VCshift[1,2])
+sapply(results_healthy_qvalue, function(x)x$Rshift[1,2])
+sapply(results_healthy_qvalue, function(x)x$Torshift[1,2])
+
+sapply(results_muco_qvalue, function(x)x$ARshift[1,2])
+sapply(results_muco_qvalue, function(x)x$VCshift[1,2])
+sapply(results_muco_qvalue, function(x)x$Rshift[1,2])
+sapply(results_muco_qvalue, function(x)x$Torshift[1,2])
+
