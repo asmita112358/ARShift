@@ -1,6 +1,6 @@
 library(GET)
 test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NULL, 
-                                     n_perm = 199, bw = "silverman", type = "inhom", lite = FALSE, thin_prob = 0.2) {
+                                     n_perm = 199, bw = "silverman", type = "inhom", lite = FALSE, thin_prob = 0.2, include_RL = FALSE) {
   
   if(lite) data <- rthin(data, thin_prob)
   if(is.null(r)){rmax <- 0.3 * incircle(data$window)$r; r <- seq(0, rmax, length.out = 50)}
@@ -27,9 +27,8 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
   
   
   if(type == "inhom"){
-    #obs_Kcross <- Kcross.inhom(data, i = as.character(base_taxa), j = as.character(shift_taxa), 
-    # r = r, correction = "isotropic")[[3]]
-    obs_Kcross <- Kcross.inhom(data, i = as.character(base_taxa), j = as.character(shift_taxa), r = r, correction = "isotropic")[[3]]
+        obs_Kcross <- Kcross.inhom(data, i = as.character(base_taxa), j = as.character(shift_taxa), 
+                               r = r, correction = "isotropic", sigma = bw.CvL)[[3]]
   }else{
     obs_Kcross <- Kcross(data, i = as.character(base_taxa), j = as.character(shift_taxa), 
                          r = r, correction = "isotropic")[[3]]
@@ -42,6 +41,8 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
   Kcross_toroidal <- matrix(NA, nrow = n_perm, ncol = n_dist)
   Kcross_uncorr <- matrix(NA, nrow = n_perm, ncol = n_dist)
   Kcross_areacorr <- matrix(NA, nrow = n_perm, ncol = n_dist)
+  
+  if(include_RL)Kcross_RL <- matrix(NA, nrow = n_perm, ncol = n_dist)
   
   
   
@@ -67,7 +68,7 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
     
     if(type == "inhom"){
       Kcross_toroidal[perm_idx, ] <- Kcross.inhom(data_shifted_tor, i = as.character(base_taxa), j = as.character(shift_taxa),
-                                                  r = r, correction = "isotropic")[[3]]
+                                                  r = r, correction = "isotropic", sigma = bw.CvL)[[3]]
     }else{
       Kcross_toroidal[perm_idx, ] <- Kcross(data_shifted_tor, i = as.character(base_taxa), j = as.character(shift_taxa),
                                             r = r, correction = "isotropic")[[3]]
@@ -95,8 +96,9 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
     pp_og <- data[window_reduced]
     
     if(type == "inhom"){
+      
       Kcross_uncorr[perm_idx,] <- Kcross.inhom(pp_reduced, i = as.character(base_taxa), j = as.character(shift_taxa), 
-                                               r = r, correction = "isotropic")[[3]]
+                                               r = r, correction = "isotropic", sigma = bw.CvL)[[3]]
     
     }else{
       Kcross_uncorr[perm_idx,] <- Kcross(pp_reduced, i = as.character(base_taxa), j = as.character(shift_taxa), 
@@ -114,7 +116,21 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
     if (is.na(n_base_vc) || is.na(n_shift_vc) || n_base_vc == 0 || n_shift_vc == 0) next
     
     shift_vectors[,perm_idx] = c(shift_x, shift_y)
-    
+    if(include_RL){
+      permuted_marks <- sample(data$marks)
+      pp_RL <- ppp(data$x, data$y, window = win, marks = permuted_marks)
+      if(type == "inhom"){
+        
+        Kcross_RL[perm_idx,] <- Kcross.inhom(pp_RL, i = as.character(base_taxa), j = as.character(shift_taxa), 
+                                                 r = r, correction = "isotropic", sigma = bw.CvL)[[3]]
+        
+      }else{
+        Kcross_RL[perm_idx,] <- Kcross(pp_RL, i = as.character(base_taxa), j = as.character(shift_taxa), 
+                                           r = r, correction = "isotropic")[[3]]
+        
+      }
+      
+    }
     
     
     
@@ -131,6 +147,10 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
   
   # Global envelope tests for toroidal shift
   pval_Kcross_tor <- compute_envelope_pval(r, obs_Kcross, Kcross_toroidal)
+  
+  if(include_RL){
+    pval_RL <- compute_envelope_pval(r, obs_Kcross, Kcross_RL)
+  }else{pval_RL = NA}
   
   # Variance correction with bandwidth selection
   shift_vectors_full <- cbind(shift_vectors, c(0, 0))
@@ -152,7 +172,8 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
     pval_Kcross_tor = pval_Kcross_tor,
     pval_Kcross_vc = vc_results$pval_vc_shift,
     pval_Kcross_uncorr = pval_Kcross_uncorr, 
-    pval_Kcross_area = pval_Kcross_area
+    pval_Kcross_area = pval_Kcross_area,
+    pval_RL = pval_RL
   ))
 }
 
