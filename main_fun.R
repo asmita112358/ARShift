@@ -1,6 +1,7 @@
 library(GET)
 test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NULL, 
-                                     n_perm = 199, bw = "silverman", type = "inhom", lite = FALSE, thin_prob = 0.2, include_RL = FALSE) {
+                                     n_perm = 199, bw = "silverman", type = "inhom", lite = FALSE, 
+                                     thin_prob = 0.2, include_RL = FALSE, jump_radius = NULL) {
   
   if(lite) data <- rthin(data, thin_prob)
   if(is.null(r)){rmax <- 0.3 * incircle(data$window)$r; r <- seq(0, rmax, length.out = 50)}
@@ -54,7 +55,7 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
   if (!is.rectangle(Window(data))) {
     Window(data_toroidal) <- boundingbox(Window(data))
   }
-  
+  if(is.null(jump_radius)){jump_radius <- incircle(data$window)$r}
   perm_idx <- 1
   
   while (perm_idx <= n_perm) {
@@ -77,7 +78,7 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
     
     
     # Non-toroidal shift (variance correction)
-    jump_radius <- incircle(data$window)$r
+   
     shift_vector <- runifdisc(1, radius = jump_radius)
     shift_x <- shift_vector$x
     shift_y <- shift_vector$y
