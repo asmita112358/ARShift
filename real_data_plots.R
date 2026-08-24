@@ -106,6 +106,7 @@ pastel_cols <- c(
 pm <- ggplot(df_long, aes(x = factor(Slide), y = Detections, fill = Method)) +
   geom_bar(stat = "identity", position = "dodge", color = "black") +
   scale_fill_manual(values = pastel_cols) +
+  coord_cartesian(ylim = c(0, 55)) +
   labs(x = "Slide", y = "Number of detections", fill = "Method") +
   ggtitle("Donors with mucositis")
 pm
@@ -142,17 +143,23 @@ pastel_cols <- c(
 ph <- ggplot(df_long, aes(x = factor(Slide), y = Detections, fill = Method)) +
   geom_bar(stat = "identity", position = "dodge", color = "black") +
   scale_fill_manual(values = pastel_cols) +
+  coord_cartesian(ylim = c(0, 55)) + 
   labs(x = "Slide", y = "Number of detections", fill = "Method") +
   ggtitle("Healthy donors")
 ph 
-pm + ph + 
-plot_layout(ncol = 2, widths = c(4,3), guides = "collect") +
-  plot_annotation(tag_levels = "A") &
-  theme(
-    plot.tag = element_text(size = 16, face = "bold"),
-    plot.tag.position = c(0.02, 0.99),
-    legend.position = "bottom"
-  )
+
+
+# pm + ph + 
+# plot_layout(ncol = 2, widths = c(4,3), guides = "collect") +
+#   plot_annotation(tag_levels = "A") &
+#   theme(
+#     plot.tag = element_text(size = 16, face = "bold"),
+#     plot.tag.position = c(0.02, 0.99),
+#     legend.position = "bottom"
+#   )
+
+library(ggpubr)
+ggarrange(pm, ph, widths = c(4,3), common.legend = TRUE, legend = "bottom")
 
 ggsave("real_data_results/all_tests.png", width = 14, height = 4, units = "in", dpi = 1200)
 
