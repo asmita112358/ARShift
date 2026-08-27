@@ -1,7 +1,8 @@
 ##All simulations in manuscript
+rm(list = ls())
 library(ggplot2)
 library(mcprogress)
-rm(list = ls())
+
 
 source("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift/generate_data.R", echo = FALSE)
 source("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift/main_fun.R", echo = FALSE)

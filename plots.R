@@ -1,11 +1,12 @@
 #Plots for simulation settings
 library(ggplot2)
 library(ggpubr)
+win = square(1)
 data1 <-  generate_Thomas(win, kappa = c(12,10), mu = c(30, 20), scale = c(0.02, 0.01), dependant = FALSE)
 df <- data.frame(data1)
 p1 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S1") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 
@@ -14,7 +15,7 @@ data2 <-  generate_Thomas(win, kappa = c(12,10), mu = c(30, 20), scale = c(0.05,
 df <- data.frame(data2)
 p2 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S2") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p2
@@ -23,7 +24,7 @@ data3 <- generate_Thomas(win, kappa = c(12,10), mu = c(30, 20), scale = c(0.15, 
 df <- data.frame(data3)
 p3 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S3") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p3
@@ -32,7 +33,7 @@ data4 <- generate_LGCP(win, corrfun = "gauss", mu = 4.5, scale = 0.1, dependant 
 df <- data.frame(data4)
 p4 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S4") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p4
@@ -42,7 +43,7 @@ data5 <- generate_LGCP(win, corrfun = "gauss", mu = 4.5, scale = 0.3, dependant 
 df <- data.frame(data5)
 p5 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S5") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p5
@@ -51,7 +52,7 @@ data6 <- generate_LGCP(win, corrfun = "gauss", mu = 4.5, scale = 0.5, dependant 
 df <- data.frame(data6)
 p6 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S6") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p6
@@ -60,7 +61,7 @@ data7 <- generate_rCauchy(kappa = c(20,15), mu = c(30, 20), scale = c(0.02, 0.01
 df <- data.frame(data7)
 p7 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S7") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p7
@@ -69,7 +70,7 @@ data8 <- generate_rCauchy(kappa = c(20,15), mu = c(30, 20), scale = c(0.05, 0.04
 df <- data.frame(data8)
 p8 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S8") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p8
@@ -79,7 +80,7 @@ data9 <- generate_rCauchy(kappa = c(20,15), mu = c(30, 20), scale = c(0.15, 0.1)
 df <- data.frame(data9)
 p9 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
-  theme_minimal() +
+  theme_void() +
   labs(title = "S9") +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p9

@@ -1,6 +1,6 @@
 library(GET)
 test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NULL, 
-                                     n_perm = 199, bw = "silverman", type = "inhom", lite = FALSE, 
+                                     n_perm = 499, bw = "silverman", type = "inhom", lite = FALSE, 
                                      thin_prob = 0.2, include_RL = FALSE, jump_radius = NULL) {
   
   if(lite) data <- rthin(data, thin_prob)
