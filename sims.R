@@ -28,7 +28,7 @@ n_perm = 499
 
 Kcross_tor_rej <- Kcross_vc_rej <- Kcross_area_rej <- Kcross_uncorr_rej <- Kcross_og <- c()
 Kcross_RL <- c()
-type = "inhom"
+type = "hom"
 
 ##NULL scenario: dependent = FALSE
 ##Alternative scenario: dependent = TRUE
@@ -36,35 +36,35 @@ i = 1
 
 while(i <= n.sim){
 
-  #data <- generate_LGCP(win, corrfun = "gauss", mu = 6, scale = 0.5, dependant = FALSE)
+  data <- generate_LGCP(win, corrfun = "gauss", mu = 6, scale = 0.5, dependant = FALSE)
   
   #data <- generate_Thomas(win, kappa = c(12,10), mu = c(30, 20), scale = c(0.05, 0.04), dependant = FALSE)
   
   #data <- generate_inhom_LGCP(win, mu = 6, corrfun = "matern", dependant = TRUE)
   
-  data <- generate_inhom_thomas(win,  scale = c(0.05, 0.04), dependant = FALSE)
+  #data <- generate_inhom_thomas(win,  scale = c(0.05, 0.04), dependant = FALSE)
   
+  obj <- test_spatial_association_pmclapply(data,base_taxa = 1, shift_taxa = 2, type = "hom")
   
-  
-  pvals <- tryCatch({
-    test_spatial_association(data, base_taxa = 1, shift_taxa = 2,
-                             r = r, n_perm = n_perm, bw = "silverman", type = type, include_RL = TRUE)
-  }, error = function(e) {
-    message(paste("Error in iteration", i, ":", e$message))
-    return(NULL)
-  }, warning = function(w) {
-    message(paste("Warning in iteration", i, ":", w$message))
-  })
-  
-  if(is.null(pvals)){
-    next
-  }
-  
-  Kcross_tor_rej[i] <- pvals$pval_Kcross_tor
-  Kcross_vc_rej[i] <- pvals$pval_Kcross_vc
-  Kcross_area_rej[i] <- pvals$pval_Kcross_area
-  Kcross_uncorr_rej[i] <- pvals$pval_Kcross_uncorr
-  Kcross_RL[i] <- pvals$pval_RL
+  # pvals <- tryCatch({
+  #   test_spatial_association(data, base_taxa = 1, shift_taxa = 2,
+  #                            r = r, n_perm = n_perm, bw = "silverman", type = type, include_RL = TRUE)
+  # }, error = function(e) {
+  #   message(paste("Error in iteration", i, ":", e$message))
+  #   return(NULL)
+  # }, warning = function(w) {
+  #   message(paste("Warning in iteration", i, ":", w$message))
+  # })
+  # 
+  # if(is.null(pvals)){
+  #   next
+  # }
+
+  Kcross_tor_rej[i] <- obj$pval_Kcross_tor
+  Kcross_vc_rej[i] <- obj$pval_Kcross_vc
+  Kcross_area_rej[i] <- obj$pval_Kcross_area
+  Kcross_uncorr_rej[i] <- obj$pval_Kcross_uncorr
+  Kcross_RL[i] <- obj$pval_Kcross_RL
   
   
   print(i)

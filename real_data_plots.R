@@ -4,20 +4,23 @@ library(pals)
 library(ggvenn)
 library(ggVennDiagram)
 library(ggplot2)
+library(ggpubr)
+library(patchwork)
 library(tidyr)
 library(dplyr)
+library(grid)
 #Example plot, muco i
-i = 9
+i = 17
 setwd("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_microbiome_twosample")
 load(paste0("/Users/asmitaroy/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_microbiome4/spatial_microbiome4/windows/", path, ".RData"))
 
 path <- muco.list[i]
 img <- read.csv(file=paste0("centroid_sciname_tables/",path))
 img.df <- process_df(img)
-ppp_img=ppp_img=ppp(x=img.df$x, y=img.df$y, c(min(img.df$x), max(img.df$x)), c(min(img.df$y), max(img.df$y)),
-                    marks=as.factor(img.df$sciname))
+ppp_img=ppp_img=rthin(ppp(x=img.df$x, y=img.df$y, c(min(img.df$x), max(img.df$x)), c(min(img.df$y), max(img.df$y)),
+                    marks=as.factor(img.df$sciname)), 0.2)
 #ppp_img <- rthin(ppp_img, 0.2)
-ppp_df <- data.frame(ppp_img)
+ppp_df <- data.frame(ppp_img) %>% filter(marks %in% all_taxa)
 colnames(ppp_df)[3] <- "Taxa"
 # Custom 18-color distinct pastel palette
 my_18_colors <- c(
@@ -26,26 +29,25 @@ my_18_colors <- c(
   "#F67280", "#F9B208", "#97DECE", "#6CAEED", "#A7BBC7", "#BB9CC0"
 )
 muco1 <- ggplot(ppp_df, aes(x = x, y = y, color = Taxa)) +
-  geom_point(size = 1) +
-  scale_color_manual(values = my_18_colors) + 
-  coord_equal() + # Important for spatial data
-  ggtitle("Slide 9, mucositis")+
-  theme_minimal() +
-  theme(legend.position = "bottom",plot.title = element_text(hjust = 0.5))
+  geom_point(size = 0.5) +
+  ggtitle("Peri Implant Mucositis, Image 17")+
+  theme_void() +
+  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5))+
+  theme(legend.title = element_text(size = 13), legend.text = element_text(size = 13)) 
 
 muco1
 dir <- "~/Library/CloudStorage/OneDrive-JohnsHopkins/spatial_assoc_test/ARShift/real_data_results/"
-ggsave(paste0(dir,"muco9.png"), muco5, width = 5, height = 6, units = "in")
+#ggsave(paste0(dir,"muco19.png"), muco1, width = 5, height = 6, units = "in")
 setwd("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift")
 results_healthy_qvalue <- readRDS("real_data_results/Qresultshealthy.rds")
 results_muco_qvalue <- readRDS("real_data_results/Qresultsmuco.rds")
 
-##Venn diagram for slide 9, mucositis
+##Venn diagram for slide 17, mucositis
 
 results_healthy_qvalue <- readRDS(paste0(dir,"Qresultshealthy.rds"))
 results_muco_qvalue <- readRDS(paste0(dir,"Qresultsmuco.rds"))
 
-i = 9
+
 ARShift_q <- na.omit(as.vector(results_muco_qvalue[[i]]$ARshift))
 VC_shift_q <- na.omit(as.vector(results_muco_qvalue[[i]]$VCshift))
 Rshift_q <- na.omit(as.vector(results_muco_qvalue[[i]]$Rshift))
@@ -56,19 +58,20 @@ colSums(df <= 0.05)
 taxa_names <- rownames(results_muco_qvalue[[i]]$ARshift)
 taxa_pair <- combn(taxa_names, 2)
 taxa_pair_list <- paste0(taxa_pair[1,], "_", taxa_pair[2,])
+
 x = list(ARShift = taxa_pair_list[ARShift_q <= 0.05], VCShift = taxa_pair_list[VC_shift_q <= 0.05], 
          RShift = taxa_pair_list[Rshift_q <= 0.05], Torshift = taxa_pair_list[Torshift_q <= 0.05])
-vplot <- ggVennDiagram(x) + scale_fill_gradient(low = "lightblue", high = "darkblue") + 
-  ggtitle("Taxa pairs detected")+theme(plot.title = element_text(hjust = 0.5), legend.position = "bottom")
+vplot <- ggVennDiagram(x, label = "count") + #scale_fill_gradient(low = "#D73027", high = "gray90") + 
+  ggtitle("Significantly co-clustered taxa pairs")+theme(plot.title = element_text(hjust = 0.5, size = 13), legend.position = "bottom")
 vplot
 muco1 + vplot +
-  plot_layout(ncol = 2) +
+plot_layout(ncol = 2, widths = c(3,3)) +
   plot_annotation(tag_levels = "A") &
   theme(
     plot.tag = element_text(size = 16, face = "bold"),
     plot.tag.position = c(0.02, 0.99)
   )
-ggsave("real_data_results/slide9_results.png", width = 11, height = 6.5, units = "in")
+ggsave("plots/slide17_results.png", width = 14.5, height = 8, units = "in")
 
 
 ##Complete table of detections
@@ -159,7 +162,67 @@ ph
 #   )
 
 library(ggpubr)
-ggarrange(pm, ph, widths = c(4,3), common.legend = TRUE, legend = "bottom")
+all_rej <- ggarrange(pm + rremove("ylab"), ph + rremove("ylab"), widths = c(4,3), common.legend = TRUE, legend = "bottom")
+annotate_figure(all_rej, left = textGrob("Number of rejections", rot = 90, vjust = 1, gp = gpar(cex = 1.3)))
+ggsave("plots/all_rejections.png", width = 14, height = 4, units = "in", dpi = 1200)
 
-ggsave("real_data_results/all_tests.png", width = 14, height = 4, units = "in", dpi = 1200)
 
+
+##setworking directory in ARShift for these plots
+results_healthy <- readRDS("real_data_results/resultshealthy.rds")
+results_muco <- readRDS("real_data_results/resultsmuco.rds")
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+
+extract_pairwise_results <- function(results_list,
+                                     group_label,
+                                     method = "ARshift",
+                                     value_name = "pvalue") {
+  
+  out <- lapply(seq_along(results_list), function(s) {
+    
+    mat <- results_list[[s]][[method]]
+    
+    taxa <- rownames(mat)
+    d <- length(taxa)
+    
+    # Extract upper triangle only
+    inds <- which(upper.tri(mat), arr.ind = TRUE)
+    
+    data.frame(
+      slide = s,
+      group = group_label,
+      taxon1 = taxa[inds[, 1]],
+      taxon2 = taxa[inds[, 2]],
+      pair = paste(taxa[inds[, 1]], taxa[inds[, 2]], sep = " vs "),
+      value = mat[inds],
+      method = method,
+      stringsAsFactors = FALSE
+    )
+  })
+  
+  out <- bind_rows(out)
+  names(out)[names(out) == "value"] <- value_name
+  
+  return(out)
+}
+
+df_healthy_p <- extract_pairwise_results(
+  results_list = results_healthy,
+  group_label = "Healthy",
+  method = "ARshift",
+  value_name = "pvalue"
+)
+
+df_muco_p <- extract_pairwise_results(
+  results_list = results_muco,
+  group_label = "Mucositis",
+  method = "ARshift",
+  value_name = "pvalue"
+)
+
+df_p <- bind_rows(df_healthy_p, df_muco_p)
+df_p <- df_p %>% select(slide, group, pair, pvalue)

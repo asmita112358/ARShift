@@ -57,15 +57,16 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
   }
   if(is.null(jump_radius)){jump_radius <- incircle(data$window)$r}
   perm_idx <- 1
-  
+  points_shift_original <- subset(data, marks == shift_taxa)
+  points_other_original <- subset(data, marks != shift_taxa)
   while (perm_idx <= n_perm) {
     # Toroidal shift
     data_shifted_tor <- rshift(data_toroidal, which = as.character(shift_taxa), edge = "torus")
-    freq_tor <- table(data_shifted_tor$marks)
-    n_base_tor <- as.numeric(freq_tor[as.character(base_taxa)])
-    n_shift_tor <- as.numeric(freq_tor[as.character(shift_taxa)])
-    
-    if (is.na(n_base_tor) || is.na(n_shift_tor) || n_base_tor == 0 || n_shift_tor == 0) next
+    # freq_tor <- table(data_shifted_tor$marks)
+    # n_base_tor <- as.numeric(freq_tor[as.character(base_taxa)])
+    # n_shift_tor <- as.numeric(freq_tor[as.character(shift_taxa)])
+    # 
+    # if (is.na(n_base_tor) || is.na(n_shift_tor) || n_base_tor == 0 || n_shift_tor == 0) next
     
     if(type == "inhom"){
       Kcross_toroidal[perm_idx, ] <- Kcross.inhom(data_shifted_tor, i = as.character(base_taxa), j = as.character(shift_taxa),
@@ -83,18 +84,24 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
     shift_x <- shift_vector$x
     shift_y <- shift_vector$y
     
-    points_shift <- subset(data, marks == shift_taxa)
-    points_other <- subset(data, marks != shift_taxa)
-    points_shifted <- spatstat.geom::shift(points_shift, vec = c(shift_x, shift_y))
+    
+    points_shifted <- spatstat.geom::shift(points_shift_original, vec = c(shift_x, shift_y))
     
     window_shifted <- spatstat.geom::shift(original_window, vec = c(shift_x, shift_y))
     window_reduced <- intersect.owin(original_window, window_shifted)
     
     if (is.null(window_reduced) || area.owin(window_reduced) == 0) next
     
-    pp_combined <- superimpose(points_other, points_shifted)
+    pp_combined <- superimpose(points_other_original, points_shifted)
     pp_reduced <- pp_combined[window_reduced]
-    pp_og <- data[window_reduced]
+    area_shift[perm_idx] <- area.owin(window_reduced)
+    
+    
+    freq_vc <- table(pp_reduced$marks)
+    n_base_vc <- as.numeric(freq_vc[as.character(base_taxa)])
+    n_shift_vc <- as.numeric(freq_vc[as.character(shift_taxa)])
+    
+    if (is.na(n_base_vc) || is.na(n_shift_vc) || n_base_vc == 0 || n_shift_vc == 0) next
     
     if(type == "inhom"){
       
@@ -107,14 +114,7 @@ test_spatial_association <- function(data, base_taxa = 1, shift_taxa = 2, r = NU
    
     }
     
-    area_shift[perm_idx] <- area.owin(window_reduced)
     
-    
-    freq_vc <- table(pp_reduced$marks)
-    n_base_vc <- as.numeric(freq_vc[as.character(base_taxa)])
-    n_shift_vc <- as.numeric(freq_vc[as.character(shift_taxa)])
-    
-    if (is.na(n_base_vc) || is.na(n_shift_vc) || n_base_vc == 0 || n_shift_vc == 0) next
     
     shift_vectors[,perm_idx] = c(shift_x, shift_y)
     if(include_RL){
