@@ -614,26 +614,69 @@ ggsave("real_data_results2/combined_violin_Kcross_plots.png", width = 8, height 
 
 
 
-##Plot ppp healthy 3 and ppp_muco 18 for taxa_subset
-taxa_subset <- c("Actinomyces", "Campylobacter", "Veillonella", "Fusobacterium", "Gemella")
+##Plot ppp healthy 8,13 and ppp_muco 12,18 for taxa_subset
+taxa1 <- c("Actinomyces", "Campylobacter", "Porphyromonas", "Lautropia")
+taxa2 <- c("Gemella", "Gemella", "Treponema", "Veillonella")
+taxa_subset <- unique(c(taxa1, taxa2))
+
+
+# Match each original taxon label to the color used in the first geom_point layer
+
+taxon_colors <- c(
+  "Actinomyces"   = "#F8766D",  # salmon
+  "Campylobacter" = "#C49A00",  # mustard/gold
+  "Gemella"       = "#53B400",  # green
+  "Lautropia"     = "#001F3F",  # deep navy -- changed
+  "Porphyromonas" = "#00B6EB",  # cyan-blue
+  "Treponema"     = "#A58AFF",  # lavender
+  "Veillonella"   = "#FB61D7"   # pink
+)
 
 df <- data.frame(ppp_healthy[[8]])
 df <- df[df$marks %in% taxa_subset, ]
 p1 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point(size = 0.5) +
-  theme_minimal()+
-  labs(title = "Healthy Slide 8") 
+  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 13))+
+  labs(title = "Peri Implant Health, 8") 
 p1
 
-built_plot <- ggplot_build(p1)
-extracted_colors <- unique(built_plot$data[[1]]$colour)
-extracted_colors
+df <- data.frame(ppp_healthy[[13]])
+df <- df[df$marks %in% taxa_subset, ]
+p2 <- ggplot(df, aes(x = x, y = y, color = marks)) +
+  geom_point(size = 0.5) +
+  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 13))+
+  labs(title = "Peri Implant Health, 13")
+
+p2
+
+df <- data.frame(ppp_muco[[12]])
+df <- df[df$marks %in% taxa_subset, ]
+p3 <- ggplot(df, aes(x = x, y = y, color = marks)) +
+  geom_point(size = 0.5) +
+  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 13))+
+  labs(title = "Peri Implant Mucositis, 12")
+p3
+
 df <- data.frame(ppp_muco[[18]])
 df <- df[df$marks %in% taxa_subset, ]
-p2 <- ggplot(df, aes(x = x, y = y, color = marks))+
+p4 <- ggplot(df, aes(x = x, y = y, color = marks))+
   geom_point(size = 0.5) +
-  theme_minimal()+
-  labs(title = "Mucositis Slide 18")
-p2
-ggpubr::ggarrange(p1, p2, ncol = 2, common.legend = TRUE, legend = "bottom")
-ggsave("real_data_results2/exampleslides.png", width = 8, height = 4, units = "in")
+  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 13))+
+  labs(title = "Peri Implant Mucositis, 18")
+p4
+
+
+library(patchwork)
+
+p1 + p2 + p3 + p4 + plot_layout(ncol = 2, guides = "collect") +plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 13, face = "bold"),
+                                                                                                         plot.tag.position = c(0.02, 0.97), legend.position = "bottom", legend.title = element_blank())
+
+ggsave("plots/exampleslides.png", width = 5.5, height = 6, units = "in", dpi = 1200)
