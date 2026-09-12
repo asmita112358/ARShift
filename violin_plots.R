@@ -160,9 +160,10 @@ plot_Kcross <- function(ppp_healthy, ppp_muco, taxon1, taxon2){
     )
   
   ggplot(d_long, aes(x = r, y = d, color = group_label, group = sample_id)) +
-    geom_line(alpha = 0.5) +
-    scale_color_manual(values = c("#26818e",
-                                  "#c33b4f")) +
+    geom_line(alpha = 0.3) +
+    scale_color_manual(values = c("navy",
+                                  "darkred")) +
+    scale_linetype_manual(values = c("solid", "twodash")) +
     geom_hline(yintercept = 0, linetype = "solid", color = "black", linewidth = 0.6)+
     labs(y = expression(L(r) - r))+
     theme_minimal() +

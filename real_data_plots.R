@@ -22,17 +22,29 @@ ppp_img=ppp_img=rthin(ppp(x=img.df$x, y=img.df$y, c(min(img.df$x), max(img.df$x)
 #ppp_img <- rthin(ppp_img, 0.2)
 ppp_df <- data.frame(ppp_img) %>% filter(marks %in% all_taxa)
 colnames(ppp_df)[3] <- "Taxa"
-# Custom 18-color distinct pastel palette
-my_18_colors <- c(
-  "#FFB4B4", "#FFF5C2", "#C0EEF2", "#B5DEFF", "#D5B4B4", "#E1BEE7",
-  "#F9DBBD", "#FFE0AC", "#E8F9FD", "#E3BEC6", "#E4DCCF", "#F3E8EE",
-  "#F67280", "#F9B208", "#97DECE", "#6CAEED", "#A7BBC7", "#BB9CC0"
+taxon_colors <- c(
+  "Actinomyces"    = "#F8766D",  # salmon (specified)
+  "Campylobacter"  = "#D99000",  # warm ochre
+  "Capnocytophaga" = "#A68B00",  # muted gold
+  "Fusobacterium"  = "#7A9A01",  # olive green
+  "Gemella"        = "#53B400",  # green (specified)
+  "Lautropia"      = "#001F3F",  # deep navy (specified)
+  "Leptotrichia"   = "#00A98F",  # sea green
+  "Porphyromonas"  = "#00A6A6",  # teal
+  "Prevotella"     = "#1B9ECA",  # soft cyan-blue
+  "Rothia"         = "#4C78A8",  # muted blue
+  "Selenomonas"    = "#8E7CC3",  # soft purple
+  "Streptococcus"  = "#C77CFF",  # lavender
+  "Treponema"      = "#E76BF3",  # orchid
+  "Veillonella"    = "#FB61D7"   # pink (specified)
 )
 muco1 <- ggplot(ppp_df, aes(x = x, y = y, color = Taxa)) +
   geom_point(size = 0.5) +
   ggtitle("Peri Implant Mucositis, Image 17")+
   theme_void() +
-  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5))+
+  scale_color_manual(values = taxon_colors) +
+  guides(color = guide_legend(override.aes = list(size = 1.5))) +
+  theme(legend.position = "bottom", plot.title = element_text(size = 16, hjust = 0.5))+
   theme(legend.title = element_text(size = 13), legend.text = element_text(size = 13)) 
 
 muco1
@@ -61,8 +73,8 @@ taxa_pair_list <- paste0(taxa_pair[1,], "_", taxa_pair[2,])
 
 x = list(ARShift = taxa_pair_list[ARShift_q <= 0.05], VCShift = taxa_pair_list[VC_shift_q <= 0.05], 
          RShift = taxa_pair_list[Rshift_q <= 0.05], Torshift = taxa_pair_list[Torshift_q <= 0.05])
-vplot <- ggVennDiagram(x, label = "count") + #scale_fill_gradient(low = "#D73027", high = "gray90") + 
-  ggtitle("Significantly co-clustered taxa pairs")+theme(plot.title = element_text(hjust = 0.5, size = 13), legend.position = "bottom")
+vplot <- ggVennDiagram(x, label = "count", label_size = 7) + #scale_fill_gradient(low = "#D73027", high = "gray90") + 
+  ggtitle("Significantly co-clustered taxa pairs")+theme(plot.title = element_text(hjust = 0.5, size = 16), legend.position = "bottom")
 vplot
 muco1 + vplot +
 plot_layout(ncol = 2, widths = c(3,3)) +
