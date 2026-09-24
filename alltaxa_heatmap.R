@@ -43,6 +43,9 @@ for(i in seq_along(ppp_healthy)){
 }
 
 colnames(out) <- c(paste0("Mucositis_", seq_along(ppp_muco)), paste0("Healthy_", seq_along(ppp_healthy)))
+
+##save this into real_data_results
+#saveRDS(out, "real_data_results/pvaltable_all.rds")
 out <- -log10(out)
 
 mid <- -log10(0.05)

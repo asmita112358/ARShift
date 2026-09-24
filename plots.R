@@ -86,15 +86,64 @@ p9 <- ggplot(df, aes(x = x, y = y, color = marks)) +
 p9
 
 
-p_all <- ggarrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, ncol = 3,nrow = 3, legend = "bottom",common.legend = TRUE)
+p_all <- ggarrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, ncol = 3,nrow = 3, legend = "right",common.legend = TRUE)
 p_all
-ggsave("plots/sim_examples.png", width = 6, height = 6,units = "in", dpi = 1200)
+library(cowplot)
+library(grid)
+p_all_labeled <- ggdraw() +
+  
+  # Main panel, shifted right to leave room for strips
+  draw_plot(p_all, x = 0.10, y = 0, width = 0.90, height = 1) +
+  
+  # Grey strips
+  draw_grob(
+    rectGrob(gp = gpar(fill = "grey85", col = NA)),
+    x = 0.01, y = 0.7, width = 0.075, height = 0.25
+  ) +
+  draw_grob(
+    rectGrob(gp = gpar(fill = "grey85", col = NA)),
+    x = 0.01, y = 0.39, width = 0.075, height = 0.25
+  ) +
+  draw_grob(
+    rectGrob(gp = gpar(fill = "grey85", col = NA)),
+    x = 0.01, y = 0.01, width = 0.075, height = 0.3
+  ) +
+  
+  # Text on top of strips
+  draw_label(
+    "Thomas",
+    x = 0.0475, y = 0.815,
+    angle = 90, fontface = "bold", size = 12
+  ) +
+  draw_label(
+    "LGCP",
+    x = 0.0475, y = 0.515,
+    angle = 90, fontface = "bold", size = 12
+  ) +
+  draw_label(
+    "Neyman-Scott",
+    x = 0.0475, y = 0.15,
+    angle = 90, fontface = "bold", size = 12
+  )
+
+p_all_labeled
+p_final <- annotate_figure(
+  p_all_labeled,
+  bottom = text_grob(
+    "cluster spread \u2192",
+    size = 12
+  )
+)
+
+p_final
+
+ggsave("plots/sim_examples_labelled.png", width = 6, height = 6,units = "in", dpi = 1200)
 
 
 
 ###Plots for inhomogeneous simulations
-
-data10 <- generate_inhom_thomas(win,  scale = c(0.05, 0.04), dependant = FALSE)
+win = square(2.5)
+data10 <- data <- generate_inhom_thomas(win, kappa = 1, scale = c(0.05, 0.04), dependant = FALSE)
 df <- data.frame(data10)
 p10 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +
@@ -113,11 +162,7 @@ p11 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   scale_color_manual(values = c("coral3", "darkolivegreen"))
 p11
 
-data12 <- generate_inhom_cauchy(
-     win,
-       scale = c(0.05, 0.04),
-       dependant = FALSE
-   )
+data12 <- generate_inhom_cauchy(win, kappa = 10, scale = c(0.05, 0.04), dependant = FALSE)
 df <- data.frame(data12)
 p12 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point() +

@@ -87,7 +87,7 @@ generate_inhom_LGCP <- function(win, corrfun = "matern",mu = 5, scale = 0.5, dep
                   win = win) 
  }else{
    data2 <- data1
-   runif_sh <- runifdisc(data1$n, radius = 0.05)
+   runif_sh <- runifdisc(data1$n, radius = 0.2)
    data2$x <- data1$x + runif_sh$x
    data2$y <- data1$y + runif_sh$y
    
@@ -111,7 +111,7 @@ generate_inhom_thomas <- function(win, kappa = 50, scale = c(0.05,0.05), dependa
     data2 <- rThomas(Z, scale = scale[2], mu = 10, win = win)
   }else{
     data2 <- data1
-    runif_sh <- runifdisc(data1$n, radius = 0.05)
+    runif_sh <- runifdisc(data1$n, radius = 0.2)
     data2$x <- data1$x + runif_sh$x
     data2$y <- data1$y + runif_sh$y
     
@@ -159,7 +159,7 @@ generate_inhom_cauchy <- function(win, kappa = 10, scale = c(0.05, 0.05),
     
     data2 <- data1
     
-    runif_sh <- runifdisc(data1$n, radius = 0.05)
+    runif_sh <- runifdisc(data1$n, radius = 0.2)
     data2$x <- data1$x + runif_sh$x
     data2$y <- data1$y + runif_sh$y
     

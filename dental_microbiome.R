@@ -622,6 +622,8 @@ taxa_subset <- unique(c(taxa1, taxa2))
 
 # Match each original taxon label to the color used in the first geom_point layer
 
+taxa_subset <- c("Actinomyces", "Gemella", "Lautropia", "Veillonella")
+
 taxon_colors <- c(
   "Actinomyces"   = "#F8766D",  # salmon
   "Campylobacter" = "#C49A00",  # mustard/gold
@@ -632,45 +634,46 @@ taxon_colors <- c(
   "Veillonella"   = "#FB61D7"   # pink
 )
 
-df <- data.frame(ppp_healthy[[8]])
+df <- data.frame(ppp_healthy[[14]])
 df <- df[df$marks %in% taxa_subset, ]
 p1 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point(size = 0.5) +
-  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  scale_color_manual(values = taxon_colors, drop = TRUE) +
   theme_void()+
   theme(plot.title = element_text(hjust = 0.5, size = 13))+
-  labs(title = "Peri Implant Health, 8") 
+  labs(title = "Peri Implant Health, 14") 
 p1
 
 df <- data.frame(ppp_healthy[[13]])
 df <- df[df$marks %in% taxa_subset, ]
 p2 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point(size = 0.5) +
-  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  scale_color_manual(values = taxon_colors, drop = TRUE) +
   theme_void()+
   theme(plot.title = element_text(hjust = 0.5, size = 13))+
   labs(title = "Peri Implant Health, 13")
 
 p2
 
-df <- data.frame(ppp_muco[[12]])
+ppp_muco_thinned <- rthin(ppp_muco[[17]], 0.2)
+df <- data.frame(ppp_muco_thinned)
 df <- df[df$marks %in% taxa_subset, ]
 p3 <- ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point(size = 0.5) +
-  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  scale_color_manual(values = taxon_colors, drop = TRUE) +
   theme_void()+
   theme(plot.title = element_text(hjust = 0.5, size = 13))+
-  labs(title = "Peri Implant Mucositis, 12")
+  labs(title = "Peri Implant Mucositis, 17")
 p3
 
-df <- data.frame(ppp_muco[[18]])
+df <- data.frame(ppp_muco[[8]])
 df <- df[df$marks %in% taxa_subset, ]
 p4 <- ggplot(df, aes(x = x, y = y, color = marks))+
   geom_point(size = 0.5) +
-  scale_color_manual(values = taxon_colors, drop = FALSE) +
+  scale_color_manual(values = taxon_colors, drop = TRUE) +
   theme_void()+
   theme(plot.title = element_text(hjust = 0.5, size = 13))+
-  labs(title = "Peri Implant Mucositis, 18")
+  labs(title = "Peri Implant Mucositis, 8")
 p4
 
 
@@ -680,3 +683,78 @@ p1 + p2 + p3 + p4 + plot_layout(ncol = 2, guides = "collect") +plot_annotation(t
                                                                                                          plot.tag.position = c(0.02, 0.97), legend.position = "bottom", legend.title = element_blank())
 
 ggsave("plots/exampleslides.png", width = 5.5, height = 6, units = "in", dpi = 1200)
+
+
+
+### Plot Porphyromonas Treponema for some slides
+
+taxon_colors <- c(
+  "Actinomyces"    = "#F8766D",  # salmon (specified)
+  "Campylobacter"  = "#D99000",  # warm ochre
+  "Capnocytophaga" = "#A68B00",  # muted gold
+  "Fusobacterium"  = "#7A9A01",  # olive green
+  "Gemella"        = "#53B400",  # green (specified)
+  "Lautropia"      = "#001F3F",  # deep navy (specified)
+  "Leptotrichia"   = "#00A98F",  # sea green
+  "Porphyromonas"  = "#00A6A6",  # teal
+  "Prevotella"     = "#1B9ECA",  # soft cyan-blue
+  "Rothia"         = "#4C78A8",  # muted blue
+  "Selenomonas"    = "#8E7CC3",  # soft purple
+  "Streptococcus"  = "#C77CFF",  # lavender
+  "Treponema"      = "#E76BF3",  # orchid
+  "Veillonella"    = "#FB61D7"   # pink (specified)
+)
+
+taxa_subset <- c("Porphyromonas", "Treponema")
+df <- data.frame(ppp_muco[[18]])
+df <- df[df$marks %in% taxa_subset, ]
+p1 <- ggplot(df, aes(x = x, y = y, color = marks)) +
+  geom_point(size = 0.5) +
+  scale_color_manual(values = taxon_colors, drop = TRUE) +
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 13))+
+  labs(title = "Peri Implant Mucositis, 18") 
+p1
+
+df <- data.frame(ppp_healthy[[1]])
+df <- df[df$marks %in% taxa_subset, ]
+p2 <- ggplot(df, aes(x = x, y = y, color = marks)) +
+  geom_point(size = 0.5) +
+  scale_color_manual(values = taxon_colors, drop = TRUE) +
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 13))+
+  labs(title = "Peri Implant Health, 1") 
+p2
+
+library(patchwork)
+
+p2 + p1 + plot_layout(ncol = 2, guides = "collect") +plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 13, face = "bold"),
+                                                                                                         plot.tag.position = c(0.02, 0.97), legend.position = "bottom", legend.title = element_blank())
+
+ggsave("plots/exampleslides_Porphyromonas_Treponema.png", width = 5.5, height = 3, units = "in", dpi = 1200)
+
+##toroidal shift example
+data_toroidal <- ppp_muco[[18]]
+original_window <- data_toroidal$window
+if (!is.rectangle(original_window)) {
+  Window(data_toroidal) <- boundingbox(original_window)
+}
+data_shift <- rshift(
+  X = data_toroidal,
+  which = "Treponema",
+  edge = "torus"
+)
+
+df <- data.frame(data_shift)
+df <- df[df$marks %in% taxa_subset, ]
+p3 <- ggplot(df, aes(x = x, y = y, color = marks)) +
+  geom_point(size = 0.8) +
+  scale_color_manual(values = taxon_colors, drop = TRUE) +
+  theme_void()+
+  theme(plot.title = element_text(hjust = 0.5, size = 13))+
+  labs(title = "Image 18 with Toroidal Shift") 
+p3
+
+p1 + p3 + plot_layout(ncol = 2, guides = "collect") +plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 13, face = "bold"),
+                                                                                                         plot.tag.position = c(0.02, 0.97), legend.position = "bottom", legend.title = element_blank())
+ggsave("plots/exampleslides_Porphyromonas_Treponema_toroidal.png", width = 7, height = 4, units = "in", dpi = 1200)

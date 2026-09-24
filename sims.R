@@ -5,7 +5,8 @@ library(mcprogress)
 
 
 source("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift/generate_data.R", echo = FALSE)
-source("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift/main_fun.R", echo = FALSE)
+#source("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift/main_fun.R", echo = FALSE)
+source("~/Library/CloudStorage/OneDrive-JohnsHopkins/Spatial_assoc_test/ARShift/main_fun_fast.R", echo = FALSE)
 
 
 #Load Irregular window if needed
@@ -19,57 +20,69 @@ W_new$xrange <- range(W_new$bdry[[1]]$x)
 W_new$yrange <- range(W_new$bdry[[1]]$y)
 
 
-#win = square(1)
-win = W_new
+win = square(2.5)
+#win = W_new
 rmax = 0.3*incircle(win)$r
 r = seq(0, rmax, length.out = 50)
-n.sim = 1000
+n.sim = 500
 n_perm = 499
 
 Kcross_tor_rej <- Kcross_vc_rej <- Kcross_area_rej <- Kcross_uncorr_rej <- Kcross_og <- c()
 Kcross_RL <- c()
-type = "hom"
+type = "inhom"
 
 ##NULL scenario: dependent = FALSE
 ##Alternative scenario: dependent = TRUE
 i = 1
 
 while(i <= n.sim){
-
-  data <- generate_LGCP(win, corrfun = "gauss", mu = 6, scale = 0.5, dependant = FALSE)
+  tryCatch({
+    #data <- generate_LGCP(win, corrfun = "gauss", mu = 6, scale = 0.5, dependant = FALSE)
+    
+    #data <- generate_Thomas(win, kappa = c(12,10), mu = c(30, 20), scale = c(0.05, 0.04), dependant = FALSE)
+    
+    #data <- generate_inhom_LGCP(win, mu = 6, corrfun = "matern", dependant = TRUE)
+    
+    #data <- generate_inhom_thomas(win,  scale = c(0.05, 0.04), dependant = FALSE)
+    
+    #data <- generate_inhom_thomas(win, kappa = 1, scale = c(0.05, 0.04), dependant = FALSE)
+    
+    data <- generate_inhom_cauchy(win, kappa = 10, scale = c(0.05, 0.04), dependant = FALSE)
+    
+    obj <- test_spatial_association_pmclapply(data, base_taxa = 1, shift_taxa = 2, type = "inhom", include_RL = TRUE)
+    
+    Kcross_tor_rej[i] <- obj$pval_Kcross_tor
+    Kcross_vc_rej[i] <- obj$pval_Kcross_vc
+    Kcross_area_rej[i] <- obj$pval_Kcross_area
+    Kcross_uncorr_rej[i] <- obj$pval_Kcross_uncorr
+    Kcross_RL[i] <- obj$pval_RL
+    
+    print(i)
+    print(Kcross_area_rej[i])
+    i <- i + 1
+    
+  }, error = function(e) {
+    
+    if(grepl("vector memory", conditionMessage(e), ignore.case = TRUE) ||
+       grepl("cannot allocate", conditionMessage(e), ignore.case = TRUE)) {
+      
+      message(paste("Memory limit reached on iteration", i, "- skipping and clearing memory"))
+      gc()
+      Sys.sleep(1)  # brief pause to allow memory to clear
+      
+    } else {
+      
+      # If it's a different error, print it but still continue
+      message(paste("Error on iteration", i, ":", conditionMessage(e)))
+      i <<- i + 1  # use <<- to modify i in the parent environment
+      
+    }
+    
+  })
   
-  #data <- generate_Thomas(win, kappa = c(12,10), mu = c(30, 20), scale = c(0.05, 0.04), dependant = FALSE)
-  
-  #data <- generate_inhom_LGCP(win, mu = 6, corrfun = "matern", dependant = TRUE)
-  
-  #data <- generate_inhom_thomas(win,  scale = c(0.05, 0.04), dependant = FALSE)
-  
-  obj <- test_spatial_association_pmclapply(data,base_taxa = 1, shift_taxa = 2, type = "hom")
-  
-  # pvals <- tryCatch({
-  #   test_spatial_association(data, base_taxa = 1, shift_taxa = 2,
-  #                            r = r, n_perm = n_perm, bw = "silverman", type = type, include_RL = TRUE)
-  # }, error = function(e) {
-  #   message(paste("Error in iteration", i, ":", e$message))
-  #   return(NULL)
-  # }, warning = function(w) {
-  #   message(paste("Warning in iteration", i, ":", w$message))
-  # })
-  # 
-  # if(is.null(pvals)){
-  #   next
-  # }
-
-  Kcross_tor_rej[i] <- obj$pval_Kcross_tor
-  Kcross_vc_rej[i] <- obj$pval_Kcross_vc
-  Kcross_area_rej[i] <- obj$pval_Kcross_area
-  Kcross_uncorr_rej[i] <- obj$pval_Kcross_uncorr
-  Kcross_RL[i] <- obj$pval_Kcross_RL
-  
-  
-  print(i)
-  print(Kcross_area_rej[i])
-  i = i+1
+  gc()
+    
+ 
 }
 
 mean(Kcross_tor_rej <= 0.05, na.rm = TRUE)
@@ -82,7 +95,7 @@ df <- data.frame(data)
 ggplot(df, aes(x = x, y = y, color = marks)) +
   geom_point(size = 1) +
   theme_minimal() +
-  labs(title = "Homogeneous Neyman-scott, cauchy kernel") +
+  labs(title = "Inhomogneous NS (Cauchy)") +
   scale_color_manual(values = c("red", "blue"))
 
 
@@ -101,12 +114,12 @@ run_one_sim <- function(i) {
       # )
       #data <- generate_inhom_LGCP(win, mu = 6, corrfun = "matern", dependant = TRUE)
       
-      # data <- generate_inhom_cauchy(
-      #   win,
-      #     scale = c(0.05, 0.04),
-      #     dependant = TRUE
-      # )
-      
+      data <- generate_inhom_cauchy(
+        win,
+          scale = c(0.05, 0.04),
+          dependant = TRUE
+      )
+
       data <- generate_rCauchy(win = win, kappa = c(20, 15), mu = c(30, 20), scale = c(0.15, 0.1), dependant = FALSE)
       #data <- generate_Thomas(win, kappa = c(10,10), mu = c(20, 20), scale = c(0.05, 0.04), dependant = FALSE)
       pvals <- test_spatial_association(
