@@ -1,25 +1,14 @@
 # ARShift
 
-Standalone R package extraction of the `pval_Kcross_area` method path from:
+This package extracts only the area-corrected ARShift method from:
 
 - `/home/runner/work/ARShift/ARShift/main_fun_fast.R::test_spatial_association_pmclapply`
 
-## Core extracted API
+## Public function
 
 - `ARShift()`
-- `arshift_pval_Kcross_area()`
 
-Both compute the area-corrected ARShift p-value (`pval_Kcross_area`) and return permutation diagnostics.
-
-## Included helper chain
-
-The package includes all helper logic needed by the extracted method:
-
-- point-process input validation
-- K-cross computation helpers
-- reduced-window shift permutations
-- area-scaling transform (`T_0`, `T_scaled`)
-- global envelope p-value computation
+`ARShift()` computes `pval_Kcross_area` and returns permutation diagnostics.
 
 ## Install locally
 
@@ -32,16 +21,18 @@ install.packages("/home/runner/work/ARShift/ARShift/arshiftmethod", repos = NULL
 ```r
 library(ARShift)
 
-X <- simulate_arshift_pair(model = "cauchy", dependant = FALSE, seed = 42)
+win <- spatstat.geom::square(1)
+a <- spatstat.random::rThomas(8, 0.05, 15, win)
+b <- spatstat.random::rThomas(7, 0.04, 14, win)
+spatstat.geom::marks(a) <- factor(rep(1, spatstat.geom::npoints(a)), levels = c(1, 2))
+spatstat.geom::marks(b) <- factor(rep(2, spatstat.geom::npoints(b)), levels = c(1, 2))
+X <- spatstat.geom::superimpose(a, b, W = win)
+spatstat.geom::marks(X) <- factor(spatstat.geom::marks(X), levels = c(1, 2))
+
 out <- ARShift(X, n_perm = 39, workers = 1)
 out$pval_Kcross_area
 ```
 
-## Migration note
+## Note on original code
 
-- Old direct wrapper usage:
-  - `source(".../main_fun_fast.R")`
-  - `test_spatial_association_pmclapply(... )$pval_Kcross_area`
-- New package usage:
-  - `library(ARShift)`
-  - `ARShift(... )$pval_Kcross_area`
+The original repository scripts and wrapper files remain untouched. This extraction lives in a separate package directory: `/home/runner/work/ARShift/ARShift/arshiftmethod`.

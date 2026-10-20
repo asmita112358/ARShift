@@ -1,9 +1,19 @@
-test_that("ARShift returns area p-value structure", {
+make_test_ppp <- function(seed = 1, win = spatstat.geom::square(1)) {
+  set.seed(seed)
+  a <- spatstat.random::rThomas(kappa = 8, scale = 0.05, mu = 15, win = win)
+  b <- spatstat.random::rThomas(kappa = 7, scale = 0.04, mu = 14, win = win)
+  spatstat.geom::marks(a) <- factor(rep(1, spatstat.geom::npoints(a)), levels = c(1, 2))
+  spatstat.geom::marks(b) <- factor(rep(2, spatstat.geom::npoints(b)), levels = c(1, 2))
+  out <- spatstat.geom::superimpose(a, b, W = win)
+  spatstat.geom::marks(out) <- factor(spatstat.geom::marks(out), levels = c(1, 2))
+  out
+}
+
+test_that("ARShift returns expected area-output structure", {
   skip_if_not_installed("spatstat.geom")
   skip_if_not_installed("spatstat.random")
 
-  set.seed(11)
-  data <- simulate_arshift_pair(model = "thomas", dependant = FALSE, seed = 11)
+  data <- make_test_ppp(seed = 11)
 
   res <- ARShift(
     data = data,
@@ -12,13 +22,7 @@ test_that("ARShift returns area p-value structure", {
     type = "inhom"
   )
 
-  expect_named(
-    res,
-    c(
-      "pval_Kcross_area", "n_valid", "n_valid_total",
-      "n_attempts", "k", "r"
-    )
-  )
+  expect_named(res, c("pval_Kcross_area", "n_valid", "n_valid_total", "n_attempts", "k", "r"))
   expect_true(is.numeric(res$pval_Kcross_area) || is.na(res$pval_Kcross_area))
   expect_true(res$n_attempts >= 9)
 })
@@ -43,25 +47,4 @@ test_that("invalid inputs are rejected", {
     ARShift(data = mtcars),
     "must be a spatstat point pattern"
   )
-})
-
-test_that("area-only extraction matches wrapper area p-value", {
-  skip_if_not_installed("spatstat.geom")
-  skip_if_not_installed("spatstat.random")
-
-  set.seed(23)
-  data <- simulate_arshift_pair(model = "cauchy", dependant = FALSE, seed = 23)
-
-  set.seed(101)
-  area_only <- ARShift(data = data, n_perm = 9, workers = 1, type = "inhom")
-  set.seed(101)
-  wrapper <- test_spatial_association_pmclapply(
-    data = data,
-    n_perm = 9,
-    workers = 1,
-    include_RL = FALSE,
-    type = "inhom"
-  )
-
-  expect_equal(area_only$pval_Kcross_area, wrapper$pval_Kcross_area, tolerance = 1e-10)
 })

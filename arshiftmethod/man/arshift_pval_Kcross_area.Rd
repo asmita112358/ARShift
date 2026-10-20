@@ -1,9 +1,8 @@
-\name{arshift_pval_Kcross_area}
-\alias{arshift_pval_Kcross_area}
+\name{ARShift}
 \alias{ARShift}
 \title{Compute ARShift area-corrected p-value}
 \usage{
-arshift_pval_Kcross_area(
+ARShift(
   data,
   base_taxa = 1,
   shift_taxa = 2,
@@ -17,8 +16,6 @@ arshift_pval_Kcross_area(
   correction = "isotropic",
   workers = max(1L, parallel::detectCores() - 1L)
 )
-
-ARShift(...)
 }
 \arguments{
 \item{data}{A marked \code{ppp} point pattern.}
@@ -33,7 +30,6 @@ ARShift(...)
 \item{jump_radius}{Shift radius for non-toroidal shifts.}
 \item{correction}{K-function correction mode.}
 \item{workers}{Number of workers for permutation attempts.}
-\item{...}{Arguments forwarded to \code{arshift_pval_Kcross_area}.}
 }
 \value{A list containing \code{pval_Kcross_area} and permutation diagnostics.}
 \description{Extracted implementation of the ARShift area-corrected p-value calculation from \code{test_spatial_association_pmclapply}.}
