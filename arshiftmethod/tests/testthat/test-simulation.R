@@ -18,6 +18,6 @@ test_that("simulation runner produces expected output", {
   )
 
   expect_equal(nrow(res), 3)
-  expect_true(all(c("reject_tor", "reject_vc", "reject_area", "reject_uncorr") %in% names(res)))
+  expect_true(all(c("pval_Kcross_area", "reject_area") %in% names(res)))
   expect_true(!is.null(attr(res, "summary")))
 })

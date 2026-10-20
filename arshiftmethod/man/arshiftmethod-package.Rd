@@ -1,6 +1,6 @@
-\name{arshiftmethod-package}
-\alias{arshiftmethod-package}
-\alias{arshiftmethod}
-\title{arshiftmethod: ARShift method extraction package}
-\description{Standalone package for the ARShift fast wrapper method and reproducible simulation helpers.}
+\name{ARShift-package}
+\alias{ARShift-package}
+\alias{ARShift}
+\title{ARShift: extracted area-corrected ARShift test method}
+\description{Standalone package for the area-corrected p-value path extracted from ARShift's fast wrapper method, with simulation helpers.}
 \docType{package}

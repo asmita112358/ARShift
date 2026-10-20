@@ -75,34 +75,22 @@ run_arshift_simulation <- function(n_sim = 20,
   for (i in seq_len(n_sim)) {
     data_i <- generator(i)
     args_i <- c(list(data = data_i), test_args)
-    result <- do.call(test_spatial_association_pmclapply, args_i)
+    result <- do.call(ARShift, args_i)
 
     out[[i]] <- data.frame(
       iter = i,
-      pval_Kcross_tor = result$pval_Kcross_tor,
-      pval_Kcross_vc = result$pval_Kcross_vc,
-      pval_Kcross_uncorr = result$pval_Kcross_uncorr,
       pval_Kcross_area = result$pval_Kcross_area,
-      pval_RL = result$pval_RL,
       stringsAsFactors = FALSE
     )
   }
 
   res <- do.call(rbind, out)
-  res$reject_tor <- res$pval_Kcross_tor <= alpha
-  res$reject_vc <- res$pval_Kcross_vc <= alpha
   res$reject_area <- res$pval_Kcross_area <= alpha
-  res$reject_uncorr <- res$pval_Kcross_uncorr <= alpha
-  res$reject_RL <- res$pval_RL <= alpha
 
   attr(res, "summary") <- list(
     alpha = alpha,
     n_sim = n_sim,
-    tor_rate = mean(res$reject_tor, na.rm = TRUE),
-    vc_rate = mean(res$reject_vc, na.rm = TRUE),
-    area_rate = mean(res$reject_area, na.rm = TRUE),
-    uncorr_rate = mean(res$reject_uncorr, na.rm = TRUE),
-    rl_rate = mean(res$reject_RL, na.rm = TRUE)
+    area_rate = mean(res$reject_area, na.rm = TRUE)
   )
 
   res

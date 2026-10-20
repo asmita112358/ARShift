@@ -1,44 +1,47 @@
-# arshiftmethod
+# ARShift
 
-Standalone R package extraction of ARShift's fast wrapper method from:
+Standalone R package extraction of the `pval_Kcross_area` method path from:
 
-- `/home/runner/work/ARShift/ARShift/main_fun_fast.R`
+- `/home/runner/work/ARShift/ARShift/main_fun_fast.R::test_spatial_association_pmclapply`
 
-## What is included
+## Core extracted API
 
-- `test_spatial_association_pmclapply()` (core extracted method)
-- Required helper utilities (variance correction, envelope p-values, bandwidth selection)
-- Simulation helpers:
-  - `simulate_arshift_pair()`
-  - `run_arshift_simulation()`
-- Unit and integration tests under `tests/testthat`
-- Example script at `inst/scripts/example_simulation.R`
+- `ARShift()`
+- `arshift_pval_Kcross_area()`
+
+Both compute the area-corrected ARShift p-value (`pval_Kcross_area`) and return permutation diagnostics.
+
+## Included helper chain
+
+The package includes all helper logic needed by the extracted method:
+
+- point-process input validation
+- K-cross computation helpers
+- reduced-window shift permutations
+- area-scaling transform (`T_0`, `T_scaled`)
+- global envelope p-value computation
 
 ## Install locally
 
 ```r
-# from repository root
 install.packages("/home/runner/work/ARShift/ARShift/arshiftmethod", repos = NULL, type = "source")
 ```
 
 ## Quick start
 
 ```r
-library(arshiftmethod)
+library(ARShift)
 
 X <- simulate_arshift_pair(model = "cauchy", dependant = FALSE, seed = 42)
-out <- test_spatial_association_pmclapply(X, n_perm = 39, workers = 1)
-out
-
-sim <- run_arshift_simulation(n_sim = 5, test_args = list(n_perm = 39, workers = 1))
-attr(sim, "summary")
+out <- ARShift(X, n_perm = 39, workers = 1)
+out$pval_Kcross_area
 ```
 
 ## Migration note
 
 - Old direct wrapper usage:
   - `source(".../main_fun_fast.R")`
-  - `test_spatial_association_pmclapply(...)`
+  - `test_spatial_association_pmclapply(... )$pval_Kcross_area`
 - New package usage:
-  - `library(arshiftmethod)`
-  - `test_spatial_association_pmclapply(...)`
+  - `library(ARShift)`
+  - `ARShift(... )$pval_Kcross_area`

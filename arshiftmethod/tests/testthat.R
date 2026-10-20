@@ -1,4 +1,4 @@
 library(testthat)
-library(arshiftmethod)
+library(ARShift)
 
-test_check("arshiftmethod")
+test_check("ARShift")

@@ -1,9 +1,9 @@
-Package: arshiftmethod
+Package: ARShift
 Type: Package
-Title: ARShift Spatial Association Test Method
+Title: ARShift Area-Corrected Spatial Association Method
 Version: 0.1.0
 Authors@R: person(given = "ARShift", family = "Contributors", role = c("aut", "cre"), email = "maintainer@example.com")
-Description: Extracted ARShift spatial association testing method with reproducible simulation utilities and tests.
+Description: Extracted implementation of the ARShift area-corrected p-value method from the fast wrapper, with required helper functions, reproducible simulation utilities, and tests.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

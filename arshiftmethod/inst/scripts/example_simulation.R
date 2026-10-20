@@ -1,9 +1,9 @@
-library(arshiftmethod)
+library(ARShift)
 
 set.seed(2026)
 
 X <- simulate_arshift_pair(model = "cauchy", dependant = FALSE)
-res <- test_spatial_association_pmclapply(
+res <- ARShift(
   data = X,
   n_perm = 39,
   workers = 1,

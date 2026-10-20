@@ -1,3 +1,5 @@
+export(ARShift)
+export(arshift_pval_Kcross_area)
 export(test_spatial_association_pmclapply)
 export(simulate_arshift_pair)
 export(run_arshift_simulation)

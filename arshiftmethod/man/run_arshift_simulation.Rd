@@ -15,7 +15,7 @@ run_arshift_simulation(
 \item{generator}{Function that returns one marked \code{ppp} dataset per replicate.}
 \item{alpha}{Significance threshold for rejection summaries.}
 \item{seed}{Optional random seed.}
-\item{test_args}{Named arguments passed to \code{test_spatial_association_pmclapply}.}
+\item{test_args}{Named arguments passed to \code{ARShift}.}
 }
-\value{A data frame of replicate p-values and rejection flags with summary attributes.}
-\description{Convenience runner for reproducible small simulation studies.}
+\value{A data frame of \code{pval_Kcross_area} and \code{reject_area} with summary attributes.}
+\description{Convenience runner for reproducible small simulation studies focused on ARShift area-corrected p-values.}
