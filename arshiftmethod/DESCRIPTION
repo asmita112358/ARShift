@@ -1,0 +1,20 @@
+Package: arshiftmethod
+Type: Package
+Title: ARShift Spatial Association Test Method
+Version: 0.1.0
+Authors@R: person(given = "ARShift", family = "Contributors", role = c("aut", "cre"), email = "maintainer@example.com")
+Description: Extracted ARShift spatial association testing method with reproducible simulation utilities and tests.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
+Depends: R (>= 4.2)
+Imports:
+    GET,
+    mcprogress,
+    spatstat.explore,
+    spatstat.geom,
+    spatstat.random
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
